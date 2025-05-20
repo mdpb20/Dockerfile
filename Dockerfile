@@ -1,11 +1,15 @@
 FROM wordpress:latest
 
-# Copia configuración y pg4wp en la carpeta correcta
-COPY wp-config.php /var/www/html/wp-config.php
-COPY wp-content/db.php /var/www/html/wp-content/db.php
-COPY wp-content/plugins/pg4wp /var/www/html/wp-content/pg4wp
+# 1) Copiamos la configuración de WordPress
+COPY wp-config.php /usr/src/wordpress/wp-config.php
 
-# Ajusta permisos
-RUN chown www-data:www-data /var/www/html/wp-config.php \
- && chown www-data:www-data /var/www/html/wp-content/db.php \
- && chown -R www-data:www-data /var/www/html/wp-content/pg4wp
+# 2) Copiamos el drop-in para PG4WP
+COPY wp-content/db.php /usr/src/wordpress/wp-content/db.php
+
+# 3) Copiamos todo el plugin pg4wp
+COPY wp-content/plugins/pg4wp /usr/src/wordpress/wp-content/plugins/pg4wp
+
+# 4) Ajustamos permisos para Apache
+RUN chown www-data:www-data /usr/src/wordpress/wp-config.php \
+ && chown www-data:www-data /usr/src/wordpress/wp-content/db.php \
+ && chown -R www-data:www-data /usr/src/wordpress/wp-content/plugins/pg4wp
