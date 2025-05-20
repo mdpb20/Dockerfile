@@ -1,11 +1,13 @@
 FROM wordpress:latest
 
-# Copia tu wp-config y PG4WP al contenedor
-COPY wp-config.php /var/www/html/wp-config.php
-COPY wp-content/db.php /var/www/html/wp-content/db.php
-COPY wp-content/plugins/pg4wp /var/www/html/wp-content/plugins/pg4wp
+# 1) Copia tu wp-config.php y el override de db.php directamente en la fuente de WP
+COPY wp-config.php                             /usr/src/wordpress/wp-config.php
+COPY wp-content/db.php                         /usr/src/wordpress/wp-content/db.php
 
-# Ajusta permisos
-RUN chown www-data:www-data /var/www/html/wp-config.php \
- && chown www-data:www-data /var/www/html/wp-content/db.php \
- && chown -R www-data:www-data /var/www/html/wp-content/plugins/pg4wp
+# 2) Copia el plugin PG4WP dentro de la fuente de WP
+COPY wp-content/plugins/pg4wp                  /usr/src/wordpress/wp-content/plugins/pg4wp
+
+# 3) Ajusta permisos
+RUN chown www-data:www-data /usr/src/wordpress/wp-config.php \
+ && chown www-data:www-data /usr/src/wordpress/wp-content/db.php \
+ && chown -R www-data:www-data /usr/src/wordpress/wp-content/plugins/pg4wp
