@@ -1,54 +1,70 @@
 <?php
 /**
- * Configuración básica de WordPress para PostgreSQL en Render
+ * The base configuration for WordPress
+ * https://es.wordpress.org/documentacion/article/editando_wp-config-php/
  */
 
-// --------------------------------------------------
-// 1. Parsear DATABASE_URL (o RENDER_DATABASE_URL) desde entorno
-// --------------------------------------------------
-$database_url = getenv('DATABASE_URL') ?: getenv('RENDER_DATABASE_URL');
-if (!$database_url) {
-    die('❌ No se encontró DATABASE_URL en las variables de entorno.');
+// Evita usar la extensión MySQL nativa
+define( 'WP_USE_EXT_MYSQL', false );
+
+/**
+ * Conexión a la base de datos
+ *
+ * Prioriza DATABASE_URL (p. ej. "postgresql://user:pass@host:port/dbname"),
+ * y si no existe, usa variables individuales.
+ */
+if ( getenv('DATABASE_URL') ) {
+    // Parseamos DATABASE_URL
+    $url = parse_url( getenv('DATABASE_URL') );
+
+    define( 'DB_NAME',     ltrim( $url['path'], '/' ) );
+    define( 'DB_USER',     $url['user'] );
+    define( 'DB_PASSWORD', $url['pass'] );
+    define( 'DB_HOST',     $url['host'] . ( isset($url['port']) ? ':' . $url['port'] : '' ) );
+} else {
+    // Variables por separado (si las tienes definidas en Environment)
+    define( 'DB_NAME',     getenv('WORDPRESS_DB_NAME') );
+    define( 'DB_USER',     getenv('WORDPRESS_DB_USER') );
+    define( 'DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') );
+    define( 'DB_HOST',     getenv('WORDPRESS_DB_HOST') . ':' . getenv('WORDPRESS_DB_PORT') );
 }
 
-$parts = parse_url($database_url);
+// Codificación de caracteres
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
 
-if (!isset($parts['host'], $parts['port'], $parts['user'], $parts['pass'], $parts['path'])) {
-    die('❌ La URL de la base de datos no tiene el formato esperado.');
-}
+/**#@+
+ * Claves únicas de autenticación y salado.
+ * Colócalas a gusto en https://api.wordpress.org/secret-key/1.1/salt/
+ */
+define( 'AUTH_KEY',         'pon-aquí-tu-frase-aleatoria' );
+define( 'SECURE_AUTH_KEY',  'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_KEY',    'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_KEY',        'pon-aquí-tu-frase-aleatoria' );
+define( 'AUTH_SALT',        'pon-aquí-tu-frase-aleatoria' );
+define( 'SECURE_AUTH_SALT', 'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_SALT',   'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_SALT',       'pon-aquí-tu-frase-aleatoria' );
+/**#@-*/
 
-// --------------------------------------------------
-// 2. Definir constantes de conexión a Postgres
-// --------------------------------------------------
-define('DB_NAME',     ltrim($parts['path'], '/')); // elimina la “/” inicial
-define('DB_USER',     $parts['user']);
-define('DB_PASSWORD', $parts['pass']);
-define('DB_HOST',     $parts['host']);
-define('DB_PORT',     $parts['port']);
-
-// Forzar uso de pg4wp en lugar de ext-mysql
-define('WP_USE_EXT_MYSQL', false);
-
-define('DB_CHARSET',  'utf8');
-define('DB_COLLATE',  '');
-
-// --------------------------------------------------
-// 3. Prefijo de tablas
-// --------------------------------------------------
+/**
+ * Prefijo de las tablas de la base de datos
+ */
 $table_prefix = 'wp_';
 
-// --------------------------------------------------
-// 4. Modo debug
-// --------------------------------------------------
-define('WP_DEBUG',         true);
-define('WP_DEBUG_LOG',     true);
-define('WP_DEBUG_DISPLAY', false);
+/**
+ * Modo debug
+ */
+define( 'WP_DEBUG',       true );
+define( 'WP_DEBUG_LOG',   true );
+define( 'WP_DEBUG_DISPLAY', false );
 
-// --------------------------------------------------
-// 5. ¡Eso es todo! No editar por debajo de esta línea
-// --------------------------------------------------
+/* ¡Eso es todo, deja de editar! */
+
+/** Ruta absoluta al directorio de WordPress. */
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/' );
 }
-require_once ABSPATH . 'wp-settings.php';
 
+/** Carga las variables de WordPress y archivos de configuración. */
+require_once ABSPATH . 'wp-settings.php';
