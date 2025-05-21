@@ -1,43 +1,49 @@
 <?php
-// 1) Procesamos DATABASE_URL (en formato: postgres://user:pass@host:port/dbname)
-$database_url = getenv('DATABASE_URL');
-if ( ! $database_url ) {
-    die('Falta la variable de entorno DATABASE_URL');
-}
-$parts = parse_url( $database_url );
+/**
+ * Ajustes de PG4WP y Postgres
+ */
+define( 'WP_USE_EXT_MYSQL', false );   // Usar Postgres en lugar de MySQL
+define( 'PG4WP_LOG', false );          // Desactiva el logging interno de PG4WP
 
-// 2) Constants de WP
-define( 'DB_NAME',     ltrim( $parts['path'], '/' ) );
-define( 'DB_USER',     $parts['user'] );
-define( 'DB_PASSWORD', $parts['pass'] );
-define( 'DB_HOST',     $parts['host'] . ':' . ( $parts['port'] ?? 5432 ) );
-
-// 3) Le indicamos a WordPress que use Postgres, via PG4WP
-define( 'DB_DRIVER',   'pgsql' );
+/**
+ * Credenciales desde variables de entorno
+ */
+define( 'DB_NAME',     getenv( 'WORDPRESS_DB_NAME' ) );
+define( 'DB_USER',     getenv( 'WORDPRESS_DB_USER' ) );
+define( 'DB_PASSWORD', getenv( 'WORDPRESS_DB_PASSWORD' ) );
+define( 'DB_HOST',     getenv( 'WORDPRESS_DB_HOST' ) );
+define( 'DB_PORT',     getenv( 'WORDPRESS_DB_PORT' ) );
 define( 'DB_CHARSET',  'utf8' );
 define( 'DB_COLLATE',  '' );
 
-// 4) Salting y claves únicas (puedes generar las tuyas en https://api.wordpress.org/secret-key/1.1/salt/ )
-define( 'AUTH_KEY',         'pon-aquí-tu-clave' );
-define( 'SECURE_AUTH_KEY',  'pon-aquí-tu-clave' );
-define( 'LOGGED_IN_KEY',    'pon-aquí-tu-clave' );
-define( 'NONCE_KEY',        'pon-aquí-tu-clave' );
-define( 'AUTH_SALT',        'pon-aquí-tu-clave' );
-define( 'SECURE_AUTH_SALT', 'pon-aquí-tu-clave' );
-define( 'LOGGED_IN_SALT',   'pon-aquí-tu-clave' );
-define( 'NONCE_SALT',       'pon-aquí-tu-clave' );
-
-// 5) Prefijos y modo debug
+/**
+ * Prefijo de las tablas de la base de datos
+ */
 $table_prefix = 'wp_';
-define( 'WP_DEBUG', false );
 
-// 6) Carga de PG4WP (PLUGIN DROP-IN)
+/**
+ * Modo debug
+ */
+define( 'WP_DEBUG',         true );
+define( 'WP_DEBUG_LOG',     true );
+define( 'WP_DEBUG_DISPLAY', false );
+
+/**
+ * Carga del drop-in de PG4WP
+ * (debe existir wp-content/db.php que apunta al core de PG4WP)
+ */
 if ( file_exists( __DIR__ . '/wp-content/db.php' ) ) {
+    // Esto le indica a WP que use nuestro driver de Postgres
     define( 'DB_DROPINS', 'wp-content/db.php' );
 }
 
-// 7) ¡El resto estándar de wp-config!
+/* ¡Eso es todo, deja de editar aquí! */
+
+/** Directorio absoluto de WordPress. */
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/' );
 }
+
+/** Carga los ajustes de WordPress y arranca. */
 require_once ABSPATH . 'wp-settings.php';
+
