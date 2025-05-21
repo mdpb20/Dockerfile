@@ -1,37 +1,20 @@
 <?php
-/**
- * The base configuration for WordPress
- * https://es.wordpress.org/documentacion/article/editando_wp-config-php/
- */
+define('WP_USE_EXT_MYSQL', false);   // fuerza PostgreSQL
 
-// Evita usar la extensión MySQL nativa
-define( 'WP_USE_EXT_MYSQL', false );
+// Usamos directamente DATABASE_URL que Render inyecta
+putenv('WORDPRESS_DB_HOST=' . parse_url(getenv('DATABASE_URL'), PHP_URL_HOST));
+putenv('WORDPRESS_DB_PORT=' . parse_url(getenv('DATABASE_URL'), PHP_URL_PORT));
+putenv('WORDPRESS_DB_USER=' . parse_url(getenv('DATABASE_URL'), PHP_URL_USER));
+putenv('WORDPRESS_DB_PASSWORD=' . parse_url(getenv('DATABASE_URL'), PHP_URL_PASS));
+putenv('WORDPRESS_DB_NAME=' . ltrim(parse_url(getenv('DATABASE_URL'), PHP_URL_PATH), '/'));
 
-/**
- * Conexión a la base de datos
- *
- * Prioriza DATABASE_URL (p. ej. "postgresql://user:pass@host:port/dbname"),
- * y si no existe, usa variables individuales.
- */
-if ( getenv('DATABASE_URL') ) {
-    // Parseamos DATABASE_URL
-    $url = parse_url( getenv('DATABASE_URL') );
-
-    define( 'DB_NAME',     ltrim( $url['path'], '/' ) );
-    define( 'DB_USER',     $url['user'] );
-    define( 'DB_PASSWORD', $url['pass'] );
-    define( 'DB_HOST',     $url['host'] . ( isset($url['port']) ? ':' . $url['port'] : '' ) );
-} else {
-    // Variables por separado (si las tienes definidas en Environment)
-    define( 'DB_NAME',     getenv('WORDPRESS_DB_NAME') );
-    define( 'DB_USER',     getenv('WORDPRESS_DB_USER') );
-    define( 'DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') );
-    define( 'DB_HOST',     getenv('WORDPRESS_DB_HOST') . ':' . getenv('WORDPRESS_DB_PORT') );
-}
-
-// Codificación de caracteres
-define( 'DB_CHARSET', 'utf8' );
-define( 'DB_COLLATE', '' );
+// Wordpress espera estas constantes:
+define('DB_NAME',     getenv('WORDPRESS_DB_NAME'));
+define('DB_USER',     getenv('WORDPRESS_DB_USER'));
+define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD'));
+define('DB_HOST',     getenv('WORDPRESS_DB_HOST') . ':' . getenv('WORDPRESS_DB_PORT'));
+define('DB_CHARSET',  'utf8');
+define('DB_COLLATE',  '');
 
 /**#@+
  * Claves únicas de autenticación y salado.
