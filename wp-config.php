@@ -2,18 +2,22 @@
 // ** Ajustes de PG4WP y Postgres ** //
 define('WP_USE_EXT_MYSQL', false);
 
-// Intentamos primero leer la URL única de la base externa
+// Leemos primero la URL única de la base externa
 $database_url = getenv('DATABASE_URL');
 
 if ( $database_url ) {
-    // parseamos: postgresql://user:pass@host:port/dbname
+    // parseamos: postgresql://user:pass@host[:port]/dbname
     $parts = parse_url( $database_url );
+    if ( false === $parts ) {
+        die("❌ DATABASE_URL mal formada: {$database_url}\n");
+    }
+
     define('DB_NAME',     ltrim($parts['path'], '/') );
-    define('DB_USER',     $parts['user'] );
-    define('DB_PASSWORD', $parts['pass'] );
-    // DB_HOST SIN puerto, y DB_PORT aparte:
-    define('DB_HOST',     $parts['host'] );
-    define('DB_PORT',     $parts['port'] );
+    define('DB_USER',     $parts['user']    ?? '' );
+    define('DB_PASSWORD', $parts['pass']    ?? '' );
+    define('DB_HOST',     $parts['host']    ?? 'localhost' );
+    // Si el puerto no viene, caemos a 5432
+    define('DB_PORT',     $parts['port']    ?? '5432' );
 } else {
     // Fallback a las 5 vars por separado
     define('DB_NAME',     getenv('WORDPRESS_DB_NAME'));
@@ -23,8 +27,8 @@ if ( $database_url ) {
     define('DB_PORT',     getenv('WORDPRESS_DB_PORT'));
 }
 
-define('DB_CHARSET',  'utf8');
-define('DB_COLLATE',  '');
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
 
 /** Prefijo de tablas **/
 $table_prefix = 'wp_';
@@ -38,4 +42,5 @@ define('WP_DEBUG_DISPLAY', false);
 if ( !defined('ABSPATH') )
     define('ABSPATH', dirname(__FILE__) . '/');
 require_once( ABSPATH . 'wp-settings.php' );
+
 
