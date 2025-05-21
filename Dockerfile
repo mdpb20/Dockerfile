@@ -1,11 +1,16 @@
 FROM wordpress:latest
 
-# Copia tu wp-config y el plugin PG4WP
-COPY wp-config.php /var/www/html/wp-config.php
-COPY wp-content/db.php /var/www/html/wp-content/db.php
-COPY wp-content/plugins/pg4wp /var/www/html/wp-content/pg4wp
+WORKDIR /var/www/html
 
-# Ajusta permisos
-RUN chown www-data:www-data /var/www/html/wp-config.php \
- && chown www-data:www-data /var/www/html/wp-content/db.php \
- && chown -R www-data:www-data /var/www/html/wp-content/plugins/pg4wp
+# 1) Asegúrate de que exista la carpeta plugins
+RUN mkdir -p wp-content/plugins
+
+# 2) Copia wp-config y db.php (nótese el --chown para asignar dueño)
+COPY --chown=www-data:www-data wp-config.php        wp-config.php
+COPY --chown=www-data:www-data wp-content/db.php     wp-content/db.php
+
+# 3) Copia el plugin pg4wp entero con dueño www-data
+COPY --chown=www-data:www-data \
+     wp-content/plugins/pg4wp \
+     wp-content/plugins/pg4wp
+
