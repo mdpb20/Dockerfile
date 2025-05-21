@@ -24,6 +24,10 @@ if ( ! defined('PG4WP_ROOT') ) {
     define('PG4WP_LOG_ERRORS', true);
   }
 
+  if ( ! defined('PG4WP_LOG') ) {
+  define('PG4WP_LOG', false);
+  }
+
   // Configuración insegura
   if ( ! defined('PG4WP_INSECURE') ) {
     define('PG4WP_INSECURE', false);
