@@ -1,49 +1,54 @@
 <?php
 /**
- * Ajustes de PG4WP y Postgres
+ * Configuración básica de WordPress + PG4WP (PostgreSQL)
  */
-define( 'WP_USE_EXT_MYSQL', false );   // Usar Postgres en lugar de MySQL
-define( 'PG4WP_LOG', false );          // Desactiva el logging interno de PG4WP
 
-/**
- * Credenciales desde variables de entorno
- */
-define( 'DB_NAME',     getenv( 'WORDPRESS_DB_NAME' ) );
-define( 'DB_USER',     getenv( 'WORDPRESS_DB_USER' ) );
+/** Evita el uso de MySQL nativo en WP */
+define( 'WP_USE_EXT_MYSQL', false );
+
+/** Control de logs internos de PG4WP */
+define( 'PG4WP_LOG', false );
+
+/** Nombre de la base de datos */
+define( 'DB_NAME', getenv( 'WORDPRESS_DB_NAME' ) );
+
+/** Usuario de la base de datos */
+define( 'DB_USER', getenv( 'WORDPRESS_DB_USER' ) );
+
+/** Contraseña de la base de datos */
 define( 'DB_PASSWORD', getenv( 'WORDPRESS_DB_PASSWORD' ) );
-define( 'DB_HOST',     getenv( 'WORDPRESS_DB_HOST' ) );
-define( 'DB_PORT',     getenv( 'WORDPRESS_DB_PORT' ) );
-define( 'DB_CHARSET',  'utf8' );
-define( 'DB_COLLATE',  '' );
 
-/**
- * Prefijo de las tablas de la base de datos
- */
+/** Host y puerto de la base de datos */
+define( 'DB_HOST', getenv( 'WORDPRESS_DB_HOST' ) . ':' . getenv( 'WORDPRESS_DB_PORT' ) );
+
+/** Codificación y colación */
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
+
+/** Prefijo de tablas */
 $table_prefix = 'wp_';
 
-/**
- * Modo debug
- */
-define( 'WP_DEBUG',         true );
-define( 'WP_DEBUG_LOG',     true );
+/** Modo depuración */
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_LOG', true );
 define( 'WP_DEBUG_DISPLAY', false );
 
 /**
- * Carga del drop-in de PG4WP
- * (debe existir wp-content/db.php que apunta al core de PG4WP)
+ * Carga el drop-in de PG4WP (db.php debe estar en wp-content/db.php)
+ * para que WordPress use el driver de PostgreSQL.
  */
 if ( file_exists( __DIR__ . '/wp-content/db.php' ) ) {
-    // Esto le indica a WP que use nuestro driver de Postgres
     define( 'DB_DROPINS', 'wp-content/db.php' );
 }
 
-/* ¡Eso es todo, deja de editar aquí! */
+/* ¡Eso es todo! No edites más abajo. */
 
-/** Directorio absoluto de WordPress. */
+/** Ruta absoluta al directorio de WordPress. */
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/' );
 }
 
-/** Carga los ajustes de WordPress y arranca. */
+/** Carga el entorno de WordPress. */
 require_once ABSPATH . 'wp-settings.php';
+
 
