@@ -1,42 +1,48 @@
 <?php
-/**
- * Configuración básica de WordPress + PG4WP (PostgreSQL)
- */
+/*
+Plugin Name: PostgreSQL for WordPress (PG4WP)
+Plugin URI: http://www.hawkix.net
+Description: PG4WP is a special 'plugin' enabling WordPress to use a PostgreSQL database.
+Version: 1.3.0+
+Author: Hawk__
+Author URI: http://www.hawkix.net
+License: GPLv2 or newer.
+*/
 
-// Para que WordPress no intente cargar la extensión MySQL nativa
-define( 'WP_USE_EXT_MYSQL', false );
+if ( ! defined('PG4WP_ROOT') ) {
 
-// Desactivar logs internos de PG4WP (se usa más abajo)
-define( 'PG4WP_LOG', false );
+  // Sólo definimos el driver si no existe
+  if ( ! defined('DB_DRIVER') ) {
+    define('DB_DRIVER', 'pgsql');
+  }
 
-/** Nombre de la base de datos de PostgreSQL */
-define( 'DB_NAME',     getenv( 'WORDPRESS_DB_NAME' ) );
+  // Debug logs
+  if ( ! defined('PG4WP_DEBUG') ) {
+    define('PG4WP_DEBUG', false);
+  }
+  if ( ! defined('PG4WP_LOG_ERRORS') ) {
+    define('PG4WP_LOG_ERRORS', true);
+  }
 
-/** Nombre de usuario de la base de datos */
-define( 'DB_USER',     getenv( 'WORDPRESS_DB_USER' ) );
+  // Configuración insegura
+  if ( ! defined('PG4WP_INSECURE') ) {
+    define('PG4WP_INSECURE', false);
+  }
 
-/** Contraseña de la base de datos */
-define( 'DB_PASSWORD', getenv( 'WORDPRESS_DB_PASSWORD' ) );
+  // Esquema por defecto
+  if ( ! defined('PG4WP_SCHEMA') ) {
+    define('PG4WP_SCHEMA', 'public');
+  }
 
-/** Host de la base de datos (incluye puerto) */
-define( 'DB_HOST',     getenv( 'WORDPRESS_DB_HOST' ) . ':' . getenv( 'WORDPRESS_DB_PORT' ) );
+  // Determina la carpeta raíz de PG4WP
+  if ( file_exists(ABSPATH . '/wp-content/pg4wp') ) {
+    define('PG4WP_ROOT', ABSPATH . '/wp-content/pg4wp');
+  } else {
+    define('PG4WP_ROOT', ABSPATH . '/wp-content/plugins/pg4wp');
+  }
 
-/** Codificación de la base de datos */
-define( 'DB_CHARSET', 'utf8' );
-define( 'DB_COLLATE', '' );
-
-/** Prefijo de las tablas */
-$table_prefix = 'wp_';
-
-/** Modo debugging */
-define( 'WP_DEBUG',         true );
-define( 'WP_DEBUG_LOG',     true );
-define( 'WP_DEBUG_DISPLAY', false );
-
-/** Absolute path al directorio de WordPress */
-if ( ! defined( 'ABSPATH' ) ) {
-    define( 'ABSPATH', __DIR__ . '/' );
+  // Carga el core
+  require_once PG4WP_ROOT . '/core.php';
 }
 
-/** Carga las variables y ajustes de WordPress */
-require_once ABSPATH . 'wp-settings.php';
+
