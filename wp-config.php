@@ -3,8 +3,10 @@
 $table_prefix = 'wp_';
 
 // Fuerza HTTPS si estás detrás de un proxy
-if ( isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
-  && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+if (
+    isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+    && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'
+) {
     $_SERVER['HTTPS'] = 'on';
 }
 
@@ -21,6 +23,7 @@ if ( getenv('DATABASE_URL') ) {
     define( 'DB_PASSWORD', $url['pass'] );
     define( 'DB_HOST',     $url['host'] . ':' . (isset($url['port']) ? $url['port'] : 5432) );
 } else {
+    // Valores de reserva (local o manual)
     define( 'DB_NAME',     'tu_basedatos' );
     define( 'DB_USER',     'tu_usuario' );
     define( 'DB_PASSWORD', 'tu_contraseña' );
@@ -41,18 +44,18 @@ define( 'DB_COLLATE', '' );
 // Genera nuevas en https://api.wordpress.org/secret-key/1.1/salt/
 // ----------------------------------------------------------------------
 define( 'AUTH_KEY',         'pon-aquí-tu-frase-aleatoria' );
-define( 'SECURE_AUTH_KEY',  '...' );
-define( 'LOGGED_IN_KEY',    '...' );
-define( 'NONCE_KEY',        '...' );
-define( 'AUTH_SALT',        '...' );
-define( 'SECURE_AUTH_SALT', '...' );
-define( 'LOGGED_IN_SALT',   '...' );
-define( 'NONCE_SALT',       '...' );
+define( 'SECURE_AUTH_KEY',  'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_KEY',    'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_KEY',        'pon-aquí-tu-frase-aleatoria' );
+define( 'AUTH_SALT',        'pon-aquí-tu-frase-aleatoria' );
+define( 'SECURE_AUTH_SALT', 'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_SALT',   'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_SALT',       'pon-aquí-tu-frase-aleatoria' );
 
 // Modo debug (producción = false)
 define( 'WP_DEBUG', false );
 
-// Forzar carpeta de idiomas personalizada
+// Carpeta de idiomas personalizada (para que coja wp-content/languages)
 define( 'WP_LANG_DIR', __DIR__ . '/wp-content/languages' );
 
 // Content dir/url para PG4WP
@@ -64,3 +67,4 @@ if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/' );
 }
 require_once ABSPATH . 'wp-settings.php';
+
