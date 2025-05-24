@@ -10,9 +10,6 @@ if (
     $_SERVER['HTTPS'] = 'on';
 }
 
-// Idioma por defecto
-define( 'WPLANG', 'es_ES' );
-
 // ----------------------------------------------------------------------
 // Parámetros de conexión a la base de datos (usando DATABASE_URL)
 // ----------------------------------------------------------------------
