@@ -1,4 +1,7 @@
 <?php
+// Forzar WordPress en español
+define( 'WPLANG', 'es_ES' );
+
 // ** Ajusta esto si cambias el prefijo de las tablas ** //
 $table_prefix = 'wp_';
 
@@ -38,13 +41,13 @@ define( 'DB_COLLATE', '' );
 // Genera nuevas en https://api.wordpress.org/secret-key/1.1/salt/
 // ----------------------------------------------------------------------
 define( 'AUTH_KEY',         'pon-aquí-tu-frase-aleatoria' );
-define( 'SECURE_AUTH_KEY',  '...' );
-define( 'LOGGED_IN_KEY',    '...' );
-define( 'NONCE_KEY',        '...' );
-define( 'AUTH_SALT',        '...' );
-define( 'SECURE_AUTH_SALT', '...' );
-define( 'LOGGED_IN_SALT',   '...' );
-define( 'NONCE_SALT',       '...' );
+define( 'SECURE_AUTH_KEY',  'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_KEY',    'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_KEY',        'pon-aquí-tu-frase-aleatoria' );
+define( 'AUTH_SALT',        'pon-aquí-tu-frase-aleatoria' );
+define( 'SECURE_AUTH_SALT', 'pon-aquí-tu-frase-aleatoria' );
+define( 'LOGGED_IN_SALT',   'pon-aquí-tu-frase-aleatoria' );
+define( 'NONCE_SALT',       'pon-aquí-tu-frase-aleatoria' );
 
 // Debug (prod = false)
 define( 'WP_DEBUG', false );
@@ -58,3 +61,4 @@ if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/' );
 }
 require_once ABSPATH . 'wp-settings.php';
+
