@@ -10,6 +10,12 @@ WORKDIR /var/www/html
 # crea carpetas
 RUN mkdir -p wp-content/plugins wp-content/languages wp-content/uploads
 
+# (suponiendo que ya tienes este COPY para el driver)
+COPY --chown=www-data:www-data wp-content/plugins/pg4wp   wp-content/plugins/pg4wp
+
+# ahora copia tu plugin
+COPY --chown=www-data:www-data wp-content/plugins/miplugin wp-content/plugins/miplugin
+
 # copia configuraciones y sube uploads.ini
 COPY --chown=www-data:www-data wp-config.php ./
 COPY --chown=www-data:www-data uploads.ini /usr/local/etc/php/conf.d/uploads.ini
