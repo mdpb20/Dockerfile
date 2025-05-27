@@ -1,30 +1,51 @@
+# ----------------------------------------
+# Usa la última imagen oficial de WordPress
+# ----------------------------------------
 FROM wordpress:latest
 
-# instala pgsql...
-RUN apt-get update && apt-get install -y libpq-dev \
+# ----------------------------------------
+# 1) Instala las extensiones de Postgres
+# ----------------------------------------
+RUN apt-get update \
+ && apt-get install -y libpq-dev \
  && docker-php-ext-install pgsql pdo_pgsql \
  && rm -rf /var/lib/apt/lists/*
 
+# ----------------------------------------
+# 2) Copia tu uploads.ini para aumentar límites de subida
+# ----------------------------------------
+# (coloca uploads.ini junto a este Dockerfile)
+COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
+# ----------------------------------------
+# 3) Fija el directorio de trabajo
+# ----------------------------------------
 WORKDIR /var/www/html
 
-# crea carpetas
+# ----------------------------------------
+# 4) Prepara carpetas vacías
+# ----------------------------------------
 RUN mkdir -p wp-content/plugins wp-content/languages wp-content/uploads
 
-# (suponiendo que ya tienes este COPY para el driver)
-COPY --chown=www-data:www-data wp-content/plugins/pg4wp   wp-content/plugins/pg4wp
-
-# ahora copia tu plugin
-COPY --chown=www-data:www-data wp-content/plugins/miplugin wp-content/plugins/miplugin
-
-# copia configuraciones y sube uploads.ini
-COPY --chown=www-data:www-data wp-config.php ./
-COPY --chown=www-data:www-data uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+# ----------------------------------------
+# 5) Copia configuración y driver PG4WP
+# ----------------------------------------
+COPY --chown=www-data:www-data wp-config.php     wp-config.php
 COPY --chown=www-data:www-data wp-content/db.php wp-content/db.php
-COPY --chown=www-data:www-data wp-content/plugins/pg4wp wp-content/plugins/pg4wp
+
+# ----------------------------------------
+# 6) Copia los plugins que quieres preinstalar
+# ----------------------------------------
+COPY --chown=www-data:www-data wp-content/plugins/pg4wp       wp-content/plugins/pg4wp
+COPY --chown=www-data:www-data wp-content/plugins/elementor-pro wp-content/plugins/elementor-pro
+COPY --chown=www-data:www-data wp-content/plugins/miplugin     wp-content/plugins/miplugin
+
+# ----------------------------------------
+# 7) Copia traducciones si las tuvieras
+# ----------------------------------------
 COPY --chown=www-data:www-data wp-content/languages wp-content/languages
 
-# Asegura permisos para todos los contenidos
+# ----------------------------------------
+# 8) Ajusta permisos finales
+# ----------------------------------------
 RUN chown -R www-data:www-data wp-content
-
-# entrypoint por defecto de WP
-
