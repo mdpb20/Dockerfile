@@ -14,7 +14,6 @@ RUN apt-get update \
 # ----------------------------------------
 # 2) Copia tu uploads.ini para aumentar límites de subida
 # ----------------------------------------
-# (coloca uploads.ini junto a este Dockerfile)
 COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # ----------------------------------------
@@ -37,7 +36,7 @@ COPY --chown=www-data:www-data wp-content/db.php wp-content/db.php
 # 6) Copia los plugins que quieres preinstalar
 # ----------------------------------------
 COPY --chown=www-data:www-data wp-content/plugins/pg4wp       wp-content/plugins/pg4wp
-COPY --chown=www-data:www-data wp-content/plugins/elementor-pro wp-content/plugins/elementor-pro
+COPY --chown=www-data:www-data wp-content/plugins/pro-elements wp-content/plugins/pro-elements
 COPY --chown=www-data:www-data wp-content/plugins/miplugin     wp-content/plugins/miplugin
 
 # ----------------------------------------

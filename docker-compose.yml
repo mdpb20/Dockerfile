@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: wp
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  wordpress:
+    build: .
+    ports:
+      - "8081:80"               
+    environment:
+      DATABASE_URL: postgres://user:pass@db:5432/wp
+    depends_on:
+      - db
+
+volumes:
+  db_data:
