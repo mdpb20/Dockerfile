@@ -11,11 +11,17 @@ services:
   wordpress:
     build: .
     ports:
-      - "8081:80"               
+      - "8081:80"
     environment:
+      # Le pasamos la URL de conexión que tu wp-config.php ya interpreta
       DATABASE_URL: postgres://user:pass@db:5432/wp
     depends_on:
       - db
+    volumes:
+      # Persistimos el directorio de uploads para que no se pierdan los archivos al redeploy
+      - wp_uploads:/var/www/html/wp-content/uploads
 
 volumes:
   db_data:
+  wp_uploads:
+
