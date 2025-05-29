@@ -29,20 +29,37 @@ RUN mkdir -p wp-content/plugins wp-content/languages wp-content/uploads
 # ----------------------------------------
 # 5) Copia configuración y driver PG4WP
 # ----------------------------------------
-COPY --chown=www-data:www-data wp-config.php     wp-config.php
+COPY --chown=www-data:www-data wp-config.php    wp-config.php
 COPY --chown=www-data:www-data wp-content/db.php wp-content/db.php
 
 # ----------------------------------------
 # 6) Copia los plugins que quieres preinstalar
 # ----------------------------------------
-COPY --chown=www-data:www-data wp-content/plugins/pg4wp       wp-content/plugins/pg4wp
-COPY --chown=www-data:www-data wp-content/plugins/pro-elements wp-content/plugins/pro-elements
-COPY --chown=www-data:www-data wp-content/plugins/miplugin     wp-content/plugins/miplugin
+# 6a) Elementor Free
+COPY --chown=www-data:www-data \
+     wp-content/plugins/elementor \
+     wp-content/plugins/elementor
+
+# 6b) Elementor Pro (o tu fork/“pro-elements”)
+COPY --chown=www-data:www-data \
+     wp-content/plugins/elementor-pro \
+     wp-content/plugins/elementor-pro
+
+# 6c) PG4WP y tu plugin de ejemplo
+COPY --chown=www-data:www-data \
+     wp-content/plugins/pg4wp \
+     wp-content/plugins/pg4wp
+
+COPY --chown=www-data:www-data \
+     wp-content/plugins/miplugin \
+     wp-content/plugins/miplugin
 
 # ----------------------------------------
 # 7) Copia traducciones si las tuvieras
 # ----------------------------------------
-COPY --chown=www-data:www-data wp-content/languages wp-content/languages
+COPY --chown=www-data:www-data \
+     wp-content/languages \
+     wp-content/languages
 
 # ----------------------------------------
 # 8) Ajusta permisos finales
