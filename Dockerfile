@@ -4,15 +4,15 @@
 FROM wordpress:latest
 
 # ----------------------------------------
-# 1) Instala las extensiones de Postgres
+# 1) Instala dependencias: Postgres + unzip/curl
 # ----------------------------------------
 RUN apt-get update \
- && apt-get install -y libpq-dev \
+ && apt-get install -y libpq-dev unzip curl \
  && docker-php-ext-install pgsql pdo_pgsql \
  && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------
-# 2) Copia tu uploads.ini para aumentar límites de subida
+# 2) Copia tu uploads.ini para límites de subida
 # ----------------------------------------
 COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
@@ -22,46 +22,43 @@ COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 WORKDIR /var/www/html
 
 # ----------------------------------------
-# 4) Prepara carpetas vacías
+# 4) Crea carpetas vacías
 # ----------------------------------------
 RUN mkdir -p wp-content/plugins wp-content/languages wp-content/uploads
 
 # ----------------------------------------
-# 5) Copia configuración y driver PG4WP
+# 5) Copia tu wp-config y db.php
 # ----------------------------------------
-COPY --chown=www-data:www-data wp-config.php    wp-config.php
+COPY --chown=www-data:www-data wp-config.php     wp-config.php
 COPY --chown=www-data:www-data wp-content/db.php wp-content/db.php
 
 # ----------------------------------------
-# 6) Copia los plugins que quieres preinstalar
+# 6) Instala Elementor Free desde wordpress.org
 # ----------------------------------------
-# 6a) Elementor Free
-COPY --chown=www-data:www-data \
-     wp-content/plugins/elementor \
-     wp-content/plugins/elementor
+RUN curl -L https://downloads.wordpress.org/plugin/elementor.latest-stable.zip -o elementor.zip \
+ && unzip elementor.zip -d wp-content/plugins/ \
+ && rm elementor.zip
 
-# 6b) Elementor Pro (o tu fork/“pro-elements”)
+# ----------------------------------------
+# 7) Copia tu plugin "pro-elements" como elementor-pro
+# ----------------------------------------
 COPY --chown=www-data:www-data \
-     wp-content/plugins/elementor-pro \
+     wp-content/plugins/pro-elements \
      wp-content/plugins/elementor-pro
 
-# 6c) PG4WP y tu plugin de ejemplo
-COPY --chown=www-data:www-data \
-     wp-content/plugins/pg4wp \
-     wp-content/plugins/pg4wp
-
-COPY --chown=www-data:www-data \
-     wp-content/plugins/miplugin \
-     wp-content/plugins/miplugin
+# ----------------------------------------
+# 8) Copia pg4wp y tu miplugin
+# ----------------------------------------
+COPY --chown=www-data:www-data wp-content/plugins/pg4wp   wp-content/plugins/pg4wp
+COPY --chown=www-data:www-data wp-content/plugins/miplugin wp-content/plugins/miplugin
 
 # ----------------------------------------
-# 7) Copia traducciones si las tuvieras
+# 9) Copia traducciones si las tuvieras
 # ----------------------------------------
-COPY --chown=www-data:www-data \
-     wp-content/languages \
-     wp-content/languages
+COPY --chown=www-data:www-data wp-content/languages wp-content/languages
 
 # ----------------------------------------
-# 8) Ajusta permisos finales
+# 10) Ajusta permisos finales
 # ----------------------------------------
 RUN chown -R www-data:www-data wp-content
+
