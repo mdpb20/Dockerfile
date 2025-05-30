@@ -40,10 +40,10 @@ RUN curl -L https://downloads.wordpress.org/plugin/elementor.latest-stable.zip -
  && rm elementor.zip
 
 # ----------------------------------------
-# 7) Copia tu plugin "pro-elements" como elementor-pro
+# 7) Copia tu plugin “elementor-pro” (antes pro-elements)
 # ----------------------------------------
 COPY --chown=www-data:www-data \
-     wp-content/plugins/pro-elements \
+     wp-content/plugins/elementor-pro \
      wp-content/plugins/elementor-pro
 
 # ----------------------------------------
@@ -53,7 +53,7 @@ COPY --chown=www-data:www-data wp-content/plugins/pg4wp   wp-content/plugins/pg4
 COPY --chown=www-data:www-data wp-content/plugins/miplugin wp-content/plugins/miplugin
 
 # ----------------------------------------
-# 9) Copia traducciones si las tuvieras
+# 9) Copia traducciones
 # ----------------------------------------
 COPY --chown=www-data:www-data wp-content/languages wp-content/languages
 
@@ -61,4 +61,3 @@ COPY --chown=www-data:www-data wp-content/languages wp-content/languages
 # 10) Ajusta permisos finales
 # ----------------------------------------
 RUN chown -R www-data:www-data wp-content
-
