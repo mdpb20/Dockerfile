@@ -1,68 +1,94 @@
 <?php
-// ** Ajusta esto si cambias el prefijo de las tablas ** //
+/**
+ * wp-config.php optimizado para:
+ *  - Contenedores / Render (DATABASE_URL)
+ *  - PostgreSQL vía PG4WP
+ *  - Idiomas en wp-content/languages
+ *  - Forzar HTTPS detrás de proxy
+ *  - Debug limpio a /wp-content/debug.log
+ */
+
+/* ---------------------------------------------------------------------
+ * 0) Prefijo de tablas
+ * -------------------------------------------------------------------*/
 $table_prefix = 'wp_';
 
-// Fuerza HTTPS si estás detrás de un proxy
-if (
-    isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
-    && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'
-) {
-    $_SERVER['HTTPS'] = 'on';
+/* ---------------------------------------------------------------------
+ * 1) Forzar HTTPS si pasamos por Cloudflare / proxy inverso
+ * -------------------------------------------------------------------*/
+if ( isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+	$_SERVER['HTTPS'] = 'on';
 }
 
-// ----------------------------------------------------------------------
-// PARÁMETROS DE CONEXIÓN A LA BASE DE DATOS
-// ----------------------------------------------------------------------
-// Si pasamos DATABASE_URL (recomendado con Docker Compose o Render)
+/* ---------------------------------------------------------------------
+ * 2) Parámetros de conexión a la base de datos
+ *    (a) Con DATABASE_URL        → Render / Docker Compose
+ *    (b) Sin DATABASE_URL        → Ajusta valores locales
+ * -------------------------------------------------------------------*/
 if ( $database_url = getenv('DATABASE_URL') ) {
-    $url = parse_url( $database_url );
-    define( 'DB_NAME',     ltrim( $url['path'], '/' ) );
-    define( 'DB_USER',     $url['user'] );
-    define( 'DB_PASSWORD', $url['pass'] );
-    define( 'DB_HOST',     $url['host'] . ':' . (isset($url['port']) ? $url['port'] : 5432) );
+	$url = parse_url( $database_url );
+
+	define( 'DB_NAME', ltrim( $url['path'], '/' ) );
+	define( 'DB_USER', $url['user'] );
+	define( 'DB_PASSWORD', $url['pass'] );
+	define( 'DB_HOST', $url['host'] . ':' . ( $url['port'] ?? 5432 ) );
 } else {
-    // Fallback para entornos donde no usemos DATABASE_URL:
-    // Cambia estos valores por tu configuración local si es necesario.
-    define( 'DB_NAME',     'tu_basedatos' );
-    define( 'DB_USER',     'tu_usuario' );
-    define( 'DB_PASSWORD', 'tu_contraseña' );
-    define( 'DB_HOST',     'localhost:5432' );
+	// --- AJUSTA ESTOS DATOS PARA TU ENTORNO LOCAL ---
+	define( 'DB_NAME',     'TU_BD_LOCAL' );
+	define( 'DB_USER',     'TU_USUARIO_LOCAL' );
+	define( 'DB_PASSWORD', 'TU_PASSWORD_LOCAL' );
+	define( 'DB_HOST',     'localhost:5432' );
 }
 
-// Driver PG4WP (no suele cambiar)
-if ( ! defined('DB_DRIVER') ) {
-    define( 'DB_DRIVER', 'pgsql' );
-}
+// Tipo de driver utilizado por PG4WP
+define( 'DB_DRIVER', 'pgsql' );
 
-// Charset y collate
+// Charset & collate
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
-// ----------------------------------------------------------------------
-// LLAVES ÚNICAS DE AUTENTICACIÓN Y SALT
-// Genera nuevas en https://api.wordpress.org/secret-key/1.1/salt/
-// ----------------------------------------------------------------------
-define( 'AUTH_KEY',         'pon-aquí-tu-frase-aleatoria' );
-define( 'SECURE_AUTH_KEY',  'pon-aquí-tu-frase-aleatoria' );
-define( 'LOGGED_IN_KEY',    'pon-aquí-tu-frase-aleatoria' );
-define( 'NONCE_KEY',        'pon-aquí-tu-frase-aleatoria' );
-define( 'AUTH_SALT',        'pon-aquí-tu-frase-aleatoria' );
-define( 'SECURE_AUTH_SALT', 'pon-aquí-tu-frase-aleatoria' );
-define( 'LOGGED_IN_SALT',   'pon-aquí-tu-frase-aleatoria' );
-define( 'NONCE_SALT',       'pon-aquí-tu-frase-aleatoria' );
+/* ---------------------------------------------------------------------
+ * 3) Claves y SALTs (genera nuevas aquí):
+ *    https://api.wordpress.org/secret-key/1.1/salt/
+ * -------------------------------------------------------------------*/
+define( 'AUTH_KEY',         'PON_AQUÍ_CLAVE_UNICA' );
+define( 'SECURE_AUTH_KEY',  'PON_AQUÍ_CLAVE_UNICA' );
+define( 'LOGGED_IN_KEY',    'PON_AQUÍ_CLAVE_UNICA' );
+define( 'NONCE_KEY',        'PON_AQUÍ_CLAVE_UNICA' );
+define( 'AUTH_SALT',        'PON_AQUÍ_CLAVE_UNICA' );
+define( 'SECURE_AUTH_SALT', 'PON_AQUÍ_CLAVE_UNICA' );
+define( 'LOGGED_IN_SALT',   'PON_AQUÍ_CLAVE_UNICA' );
+define( 'NONCE_SALT',       'PON_AQUÍ_CLAVE_UNICA' );
 
-// Modo debug (producción = false)
-define( 'WP_DEBUG', false );
+/* ---------------------------------------------------------------------
+ * 4) Modo DEBUG
+ * -------------------------------------------------------------------*/
+define( 'WP_DEBUG',         true );     // ← pon false en producción
+define( 'WP_DEBUG_LOG',     true );     // log a /wp-content/debug.log
+define( 'WP_DEBUG_DISPLAY', false );    // nada en pantalla para evitar leaks
 
-// Carpeta de idiomas personalizada (para que recoja wp-content/languages)
-define( 'WP_LANG_DIR', __DIR__ . '/wp-content/languages' );
-
-// Content dir/url para PG4WP
+/* ---------------------------------------------------------------------
+ * 5) Directorios personalizados
+ * -------------------------------------------------------------------*/
+// Ruta/URL de wp-content
 define( 'WP_CONTENT_DIR', __DIR__ . '/wp-content' );
-define( 'WP_CONTENT_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/wp-content' );
+define( 'WP_CONTENT_URL',
+	( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://' ) .
+	$_SERVER['HTTP_HOST'] . '/wp-content'
+);
 
-// ¡No edites más allá de esto!
+// Carpeta de idiomas fuera del core
+define( 'WP_LANG_DIR', WP_CONTENT_DIR . '/languages' );
+
+/* ---------------------------------------------------------------------
+ * 6) (Opcional) Forzar método de escritura directa en contenedor
+ * -------------------------------------------------------------------*/
+// define( 'FS_METHOD', 'direct' );
+
+/* ---------------------------------------------------------------------
+ * 7) ¡No edites nada a partir de aquí!
+ * -------------------------------------------------------------------*/
 if ( ! defined( 'ABSPATH' ) ) {
-    define( 'ABSPATH', __DIR__ . '/' );
+	define( 'ABSPATH', __DIR__ . '/' );
 }
 require_once ABSPATH . 'wp-settings.php';
